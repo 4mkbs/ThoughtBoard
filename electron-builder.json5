@@ -3,6 +3,7 @@
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "com.github.4mkbs.thoughtboard",
   "asar": true,
+  "compression": "maximum",
   "productName": "ThoughtBoard",
   "directories": {
     "output": "release/${version}"

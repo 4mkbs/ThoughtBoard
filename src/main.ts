@@ -1,4 +1,8 @@
 import './style.css'
+import { invoke, isElectron } from './api'
+
+// The browser build has no custom titlebar or file-system buttons
+if (!isElectron) document.body.classList.add('is-web')
 
 interface Post {
   id: string
@@ -126,13 +130,13 @@ backdropEl.addEventListener('click', closeDrawer)
 
 // Window Controls Event Listeners
 document.getElementById('win-min')!.addEventListener('click', () => {
-  window.ipcRenderer.invoke('window-minimize')
+  invoke('window-minimize')
 })
 document.getElementById('win-max')!.addEventListener('click', () => {
-  window.ipcRenderer.invoke('window-maximize')
+  invoke('window-maximize')
 })
 document.getElementById('win-close')!.addEventListener('click', () => {
-  window.ipcRenderer.invoke('window-close')
+  invoke('window-close')
 })
 
 // Identity Management
@@ -215,7 +219,7 @@ function handleLogout() {
 // Fetch Posts from Storage
 async function fetchPosts() {
   try {
-    posts = await window.ipcRenderer.invoke('get-posts')
+    posts = await invoke('get-posts')
     renderPosts()
   } catch (error: any) {
     showToast(`Failed to load posts: ${error.message}`, 'error')
@@ -225,7 +229,7 @@ async function fetchPosts() {
 // Fetch DB File Location
 async function fetchDbPath() {
   try {
-    dbFilePath = await window.ipcRenderer.invoke('get-db-path')
+    dbFilePath = await invoke('get-db-path')
     renderDbPanel()
   } catch (error: any) {
     console.error('Failed to get database path:', error)
@@ -323,7 +327,7 @@ function cancelEditing() {
 async function handleDeletePost(id: string) {
   if (!confirm('Are you sure you want to delete this thought?')) return
   try {
-    posts = await window.ipcRenderer.invoke('delete-post', { id, currentUser })
+    posts = await invoke('delete-post', { id, currentUser })
     showToast('Thought deleted successfully')
     renderPosts()
     if (editingPostId === id) {
@@ -399,7 +403,7 @@ async function handleSavePost(e: Event) {
 
   try {
     if (editingPostId) {
-      posts = await window.ipcRenderer.invoke('update-post', {
+      posts = await invoke('update-post', {
         id: editingPostId,
         title,
         content,
@@ -408,7 +412,7 @@ async function handleSavePost(e: Event) {
       showToast('Thought updated successfully')
       editingPostId = null
     } else {
-      posts = await window.ipcRenderer.invoke('create-post', {
+      posts = await invoke('create-post', {
         title,
         content,
         author: currentUser
@@ -430,12 +434,12 @@ function renderDbPanel() {
     <div class="db-info-panel">
       <div class="db-info-header">
         <span class="db-info-icon">📂</span>
-        <span class="db-info-title">Database Storage</span>
+        <span class="db-info-title">${isElectron ? 'Database Storage' : 'Browser Storage'}</span>
       </div>
       <div class="db-info-path" id="db-path-text">${escapeHTML(dbFilePath)}</div>
       
       <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
-        <div class="db-info-actions">
+        <div class="db-info-actions desktop-only">
           <button style="flex: 1;" class="btn btn-secondary btn-sm" id="open-db-dir-btn">Open Folder</button>
           <button style="flex: 1;" class="btn btn-secondary btn-sm" id="copy-db-path-btn">Copy Path</button>
         </div>
@@ -449,7 +453,7 @@ function renderDbPanel() {
 
   document.getElementById('open-db-dir-btn')!.addEventListener('click', async () => {
     try {
-      await window.ipcRenderer.invoke('open-db-folder')
+      await invoke('open-db-folder')
       showToast('Opened database directory')
     } catch (error: any) {
       showToast(`Failed to open folder: ${error.message}`, 'error')
@@ -467,7 +471,7 @@ function renderDbPanel() {
 
   document.getElementById('export-backup-btn')!.addEventListener('click', async () => {
     try {
-      const res = await window.ipcRenderer.invoke('export-posts')
+      const res = await invoke('export-posts')
       if (res.success) {
         showToast('Backup exported successfully')
       } else if (res.error !== 'Cancelled') {
@@ -480,7 +484,7 @@ function renderDbPanel() {
 
   document.getElementById('import-backup-btn')!.addEventListener('click', async () => {
     try {
-      const res = await window.ipcRenderer.invoke('import-posts')
+      const res = await invoke('import-posts')
       if (res.success) {
         posts = res.posts
         showToast(`Successfully imported ${res.importedCount} new thoughts!`)
@@ -509,6 +513,8 @@ fetchPosts()
 fetchDbPath()
 
 // Listen to any events if needed
-window.ipcRenderer.on('main-process-message', (_event, message) => {
-  console.log('Main process message:', message)
-})
+if (isElectron) {
+  window.ipcRenderer.on('main-process-message', (_event, message) => {
+    console.log('Main process message:', message)
+  })
+}

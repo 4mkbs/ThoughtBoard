@@ -2,7 +2,11 @@
 
 A local, offline notepad board for your desktop. Pick a username, write short "thoughts" with a title and body, and edit or delete your own. Everything is stored in a JSON file on your computer, and there's no server or account.
 
-## Download
+## Use it in your browser
+
+**https://4mkbs.github.io/ThoughtBoard/**: nothing to install. Your thoughts are saved in that browser only (clearing site data deletes them), so use *Export Backup* to keep a copy.
+
+## Download the desktop app
 
 Get the latest installer from the [Releases page](https://github.com/4mkbs/ThoughtBoard/releases/latest):
 
@@ -31,12 +35,18 @@ Requires Node.js 20+ and [pnpm](https://pnpm.io).
 
 ```bash
 pnpm install
-pnpm dev        # run the app with hot reload
+pnpm dev        # run the desktop app with hot reload
+pnpm dev:web    # run the browser version
 pnpm typecheck  # TypeScript check
 pnpm dist       # build installers for your OS into release/<version>/
+pnpm build:web  # build the website into dist-web/
 ```
 
 Built with Electron, Vite and TypeScript.
+
+## Website
+
+Every push to `main` rebuilds the browser version and deploys it to GitHub Pages.
 
 ## Making a release
 

@@ -1,7 +1,7 @@
 {
   "name": "ThoughtBoard",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ThoughtBoard - A local offline shared notepad",
   "author": {
     "name": "4mkbs",
@@ -20,7 +20,9 @@
     "typecheck": "tsc",
     "build": "tsc && vite build && electron-builder",
     "dist": "tsc && vite build && electron-builder --publish never",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:web": "vite --mode web",
+    "build:web": "tsc && vite build --mode web"
   },
   "devDependencies": {
     "typescript": "^5.2.2",

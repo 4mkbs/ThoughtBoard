@@ -665,3 +665,22 @@ body {
   display: flex;
   gap: 0.5rem;
 }
+
+/* Browser build: no custom titlebar, no file-system buttons */
+body.is-web {
+  padding-top: 0;
+}
+.is-web .window-titlebar,
+.is-web .desktop-only {
+  display: none !important;
+}
+.is-web .sliding-drawer {
+  top: 0;
+}
+
+@media (max-width: 520px) {
+  .sliding-drawer {
+    width: 100%;
+    max-width: 100%;
+  }
+}
